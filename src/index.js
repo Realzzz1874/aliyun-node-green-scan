@@ -1,13 +1,12 @@
-import uuid from "uuid";
-import axios from "axios";
-import crypto from "crypto";
+const uuid = require('uuid');
+const axios = require('axios');
+const crypto = require('crypto');
 
 class GreenScanner {
   constructor({ AccessKeyId, AccessKeySecret, endpoint = "" }) {
     this.AccessKeyId = AccessKeyId;
     this.AccessKeySecret = AccessKeySecret;
     this.endpoint = endpoint || "green.cn-shanghai.aliyuncs.com";
-    this.defaultScenes = ["porn", "abuse", "contraband", "politics"];
     this.textPath = "/green/text/scan";
     this.clientInfo = { ip: "127.0.0.1" };
   }
@@ -54,13 +53,9 @@ class GreenScanner {
     return requestHeaders;
   }
 
-  async scanText(text, scenes = []) {
-    if (!Array.isArray(scenes)) {
-      throw Error("scenes must be Array.");
-    }
-    const scenes = scenes.length > 0 ? scenes : this.defaultScenes;
+  async scanText(text) {
     const requestBody = {
-      scenes: scenes,
+      scenes: ['antispam'],
       tasks: [
         {
           dataId: uuid.v4(),
@@ -79,7 +74,9 @@ class GreenScanner {
     };
     try {
       const res = await axios(options);
-      console.log(res);
+      if (res.status == 200) {
+        return res.data;
+      }
     } catch (err) {
       throw err;
     }
